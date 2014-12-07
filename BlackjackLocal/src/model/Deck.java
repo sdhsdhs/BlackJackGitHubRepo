@@ -14,7 +14,7 @@ import model.BasicCard.Suit;
 public class Deck {
 	private Card[] cards; // the array of all the cards.
 	public static final int DECK_SIZE = 52;// fix size to array
-	int head = 0; //the refernce to where are we in the deck.
+	int head = 0; //the reference to where are we in the deck.
 	
 	/**
 	 * default and only ctor.
@@ -99,6 +99,7 @@ public class Deck {
 				return c;
     	return null;
     }
+	
 	/**
 	 * 
 	 * @return the entire deck as a String.
