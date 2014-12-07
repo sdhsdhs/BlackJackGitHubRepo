@@ -53,9 +53,10 @@ public class Deck {
 		int rand;
 		Card temp;
 		Random randIndex = new Random();
+		// Research shows a deck need at least 7 shuffles to be really randomized.
 		for (int j = 0; j < 7; j++)
-			// Research shows a deck need at least 7 shuffles to be really randomized.
 			for (int i = 0; i < DECK_SIZE; i++) {
+				randIndex.setSeed(System.nanoTime());//Different seed for each iteration for randmoness.
 				rand = randIndex.nextInt(DECK_SIZE);
 				temp = cards[i];
 				cards[i] = cards[rand];
