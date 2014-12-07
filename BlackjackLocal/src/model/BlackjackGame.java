@@ -8,7 +8,7 @@ import model.Deck.EmptyDeckException;
 
 
 /**
- * the Model in the MVC structure, this is the game Logic that uses all the basic classes
+ * the MODEL in the MVC structure, this is the game Logic that uses all the basic classes
  * 
  */
 
