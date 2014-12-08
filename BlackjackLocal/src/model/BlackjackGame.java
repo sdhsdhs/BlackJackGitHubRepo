@@ -15,7 +15,7 @@ import model.Deck.EmptyDeckException;
 public class BlackjackGame // model class
 {
 	private DealerHand dealer;//the dealer
-	private PlayerHand player;//dear mr. player may the odds always be in your favor.
+	private PlayerHand player;//dear Mr. player may the odds always be in your favor.
 	private Deck deck;
 
 	public BlackjackGame() {
@@ -69,12 +69,15 @@ public class BlackjackGame // model class
 	 * this function deals 2 cards to player and dealer
 	 * @throws EmptyDeckException 
 	 */
-	public void beginGame() throws EmptyDeckException {
+	public void beginGame()  {
+		try{
 		for (int i = 0; i < 2; i++)
 			player.AddCard(deck.deal());
 		for (int i = 0; i < 2; i++)
 			dealer.AddCard(deck.deal());
-		
+		}catch(Exception e){
+			System.out.println("deck is empty can't draw more cards");
+		}
 
 	}
 	
@@ -97,7 +100,7 @@ public class BlackjackGame // model class
 	 * not yet implemented, will be for iteration 2.
 	 */
 	public void playerDraw() {
-		//player.AddCard(deck.deal());
+		
 		// TODO Auto-generated method stub
 	}
 	
@@ -106,7 +109,7 @@ public class BlackjackGame // model class
 	 * not yet implemented, will be for iteration 2.
 	 */
 	public void dealerDraw() {
-		//dealer.AddCard(deck.deal());
+		
 		// TODO Auto-generated method stub
 	}
 	

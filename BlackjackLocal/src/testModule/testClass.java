@@ -32,7 +32,7 @@ public class testClass {
 	 * when the array list size reach 52 we stop sort(with custom comperator) and print the list to visually see that all cards have been drawn 
 	 * @throws EmptyDeckException if we step put of bound on deck.
 	 */
-	private static void TestAllCardsAreDrawn() throws EmptyDeckException
+	private static void TestAllCardsAreDrawn() throws EmptyDeckException 
 	{
 		ArrayList<Card> cards= new ArrayList<Card>();
 		Deck d = new Deck();
@@ -224,12 +224,15 @@ public class testClass {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception{
-
+		try{
 		TestAllCardsAreDrawn();
 		System.out.println("\n-----------------------------------------------------------------------------\n");
 		testAcevalueCorrect();
 		System.out.println("\n-----------------------------------------------------------------------------\n");
-		checkRandom();	
+		checkRandom();
+		}catch(Exception e){
+			System.out.println(e.getMessage());
+		}
 	}
 
 }

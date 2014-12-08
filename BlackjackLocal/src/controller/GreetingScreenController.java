@@ -17,7 +17,7 @@ public class GreetingScreenController implements Initializable, ControlledScreen
 	
 	@FXML
 	private Button btnMagic; // the button to shift to game.
-	private ScreenController myController;// the Contrller class for the controler.
+	private ScreenController myController;// the Controller class for the controller.
 	
 	/**
 	 * sets the view screen shift control.
