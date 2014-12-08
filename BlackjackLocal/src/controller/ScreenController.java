@@ -19,7 +19,7 @@ import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 /**
  * this class represents the Controllers controller :)
- * it contains a hashmap of the diffrant screens and has the ability to pass
+ * it contains a hashmap of the different screens and has the ability to pass
  * between them.
  */
 public class ScreenController extends StackPane {
