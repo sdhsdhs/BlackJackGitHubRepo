@@ -99,6 +99,9 @@ public class PlayerHand implements BasicHand {
 		}
 	}
 	
+	public Card getLastCard(){
+		return this.hand.get(hand.size()-1);
+	}
 	@Override
 	public String toString() {
 		String str="";
