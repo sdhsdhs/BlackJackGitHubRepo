@@ -85,6 +85,10 @@ public class DealerHand implements BasicHand{
 		
 	}
 	
+	public Card getLastCard(){
+		return this.hand.get(hand.size()-1);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see model.BasicHand#AddCard(model.Card)
