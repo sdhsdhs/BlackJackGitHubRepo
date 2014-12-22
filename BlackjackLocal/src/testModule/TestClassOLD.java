@@ -24,7 +24,7 @@ import model.Deck;
 import model.Deck.EmptyDeckException;
 import model.PlayerHand;
 
-public class testClass {
+public class TestClassOLD {
 	/**
 	 * in this test case we have a deck and an array list of cards.
 	 * we draw from the deck the first card and check if it exist in the array list in it doesn't we add it, then we reset the deck
@@ -58,7 +58,7 @@ public class testClass {
 			c.flip();
 			System.out.println(" "+c.toString()+" ");
 		}
-	}
+	}//end test card draw
 
 	/**
 	 * this function check 6 different Equivalence class we devised for all hands.(and the ace change sum to dealer)
@@ -166,7 +166,7 @@ public class testClass {
 		deck.reuseDeck();
 		p.clearHand();
 		d.clearHand();
-	}
+	}//end test correct results
 
 	
 	/**
@@ -178,7 +178,7 @@ public class testClass {
 	 * also it show the max and minimum number of appearances of cards.
 	 * @throws EmptyDeckException
 	 */
-	public static void checkRandom() throws EmptyDeckException{
+	public static int checkRandom() throws EmptyDeckException{
 		Deck d = new Deck();
 		int[] arr = new int[53];
 		
@@ -212,11 +212,13 @@ public class testClass {
 			arr[result]++;
 			d.reuseDeck();//reset deck.
 			}
-		System.out.println(Arrays.toString(arr));
+	
+	//  System.out.println(Arrays.toString(arr));
 		Arrays.sort(arr);
-	    System.out.println("Min value of apperances: "+arr[1]);
-	    System.out.println("Max value of apperances: "+arr[arr.length-1]);
-	}
+	 // System.out.println("Min value of apperances: "+arr[1]);
+	//  System.out.println("Max value of apperances: "+arr[arr.length-1]);
+	    return arr[arr.length-1];
+	}//end test randomness
 	
 	/**
 	 * run tests
@@ -229,7 +231,14 @@ public class testClass {
 		System.out.println("\n-----------------------------------------------------------------------------\n");
 		testAcevalueCorrect();
 		System.out.println("\n-----------------------------------------------------------------------------\n");
-		checkRandom();
+		int max=0;
+		int temp;
+		for(int i=0;i<20;i++){
+			temp=checkRandom();
+			if(temp>max)
+				max=temp;
+		}
+		System.out.println(max);
 		}catch(Exception e){
 			System.out.println(e.getMessage());
 		}
