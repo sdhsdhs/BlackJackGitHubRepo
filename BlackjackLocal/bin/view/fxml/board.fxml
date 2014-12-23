@@ -46,6 +46,5 @@
             <InnerShadow />
          </effect>
       </TextArea>
-      <MediaView fx:id="mediaMsg" fitHeight="200.0" fitWidth="200.0" layoutX="270.0" layoutY="152.0" />
    </children>
 </AnchorPane>
