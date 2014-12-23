@@ -141,6 +141,7 @@ public class ControllerFX  implements Initializable, ControlledScreen {
 		{
 			btnSetting[2]=false;
 			btnSetting[1]=false;
+			dealerVal.setText("Dealer hand: "+Integer.toString(bj.getDealerValue()));
 			bj.showAllDealerCards();
 			MsgBox.appendText("\nDealer Hand:\n"+bj.getHand(false));
 			dealerCard.getChildren().clear();
@@ -149,13 +150,15 @@ public class ControllerFX  implements Initializable, ControlledScreen {
 			{
 				Card c = bj.dealerDraw();
 				appendSinglePic(c, dealerCard);
-				MsgBox.appendText("Dealer Draw: "+c.toString()+"\nhand value:"+bj.getDealerValue());
+				dealerVal.setText("Dealer hand: "+Integer.toString(bj.getDealerValue()));
+				MsgBox.appendText("\nDealer Draw: "+c.toString()+"\nhand value:"+bj.getDealerValue());
 			}
 			bj.checkVictory(MsgBox);
 		}else{
 			MsgBox.setText("\nbutton STAND not availble at this stage.");
 		}
 	}
+	
 	
 	@FXML
 	public void btnQuitListener(ActionEvent evnt)
