@@ -22,10 +22,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
-import javafx.util.Duration;
+
 
 
 
@@ -39,6 +36,7 @@ import javafx.util.Duration;
  */
 public class ControllerFX  implements Initializable, ControlledScreen {
 
+	
 	private BlackjackGame bj; //reference to model
 	@FXML 
 	private TextArea MsgBox; //the player hand text that will show the hand in text in the view
@@ -107,6 +105,8 @@ public class ControllerFX  implements Initializable, ControlledScreen {
 			this.round++;
 			btnSetting[1]=true;//enable hit.
 			btnSetting[2]=true;//enable stand.
+		}else{
+			MsgBox.appendText("\nDeal not availble.");
 		}
 	}
 	

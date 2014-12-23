@@ -56,7 +56,6 @@ public class Deck {
 		// Research shows a deck need at least 7 shuffles to be really randomized.
 		for (int j = 0; j < 7; j++)
 			for (int i = 0; i < DECK_SIZE; i++) {
-				randIndex.setSeed(System.nanoTime());//Different seed for each iteration for randmoness.
 				rand = randIndex.nextInt(DECK_SIZE);
 				temp = cards[i];
 				cards[i] = cards[rand];
@@ -87,6 +86,10 @@ public class Deck {
 
 		return cards[head++];
 	}
+	
+	public boolean isEmpty(){
+		return head > (DECK_SIZE-1);
+	}
 
 	/**
 	 * this function is to be used only for testing!!!!!
@@ -111,6 +114,11 @@ public class Deck {
 			str += "[" + cards[i] + "] ";
 		}
 		return str;
+	}
+	
+	public Card[] getAllCards()
+	{
+		return this.cards;
 	}
 	
 	@Override
