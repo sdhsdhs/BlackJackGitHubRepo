@@ -5,21 +5,29 @@ package controller;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+
 import model.BlackjackGame;
 import model.Card;
 import model.Deck.EmptyDeckException;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
 import javafx.animation.PathTransition;
 import javafx.animation.RotateTransition;
+import javafx.animation.SequentialTransition;
+import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
@@ -37,15 +45,12 @@ public class ControllerFX  implements Initializable, ControlledScreen {
 	private BlackjackGame bj; //reference to model
 	@FXML 
 	private TextArea MsgBox; //the player hand text that will show the hand in text in the view
+	
 	@FXML 
 	private javafx.scene.control.Label playerVal;//will show the player hand value in the view
-	@FXML
-	private HBox cardHand;//will contain the player hand in the view
 
 	@FXML 
 	private javafx.scene.control.Label DealerVal;
-	@FXML
-	private HBox dealerCard;
 	@FXML
 	private javafx.scene.control.Label dealerVal;
 	@FXML
@@ -57,9 +62,17 @@ public class ControllerFX  implements Initializable, ControlledScreen {
 	@FXML
 	private Label labelDeck;
 	
-	@SuppressWarnings("unused")
+
 	private ScreenController myController;
 	
+	private double dealerPosOffset = -50;
+	private double playerPosOffset = -50;
+	
+	SequentialTransition cardsFlow = new SequentialTransition();
+	
+	ImageView imageToFlip;
+	Card cardToFlip;
+	boolean flagFlippedCard = true;
 	
 	private boolean[] btnSetting;
 	
@@ -105,15 +118,17 @@ public class ControllerFX  implements Initializable, ControlledScreen {
 			bj.incTurn();
 			turn.setText("Round: "+Integer.toString(bj.getTurn()));
 			totalScore.setText("Total Score: "+Integer.toString(bj.getTotalScore()));
-			dealerCard.getChildren().clear();
-			cardHand.getChildren().clear();
 			btnSetting[0]=false;
 			MsgBox.setText("Player Hand:\n"+bj.getHand(true)+"Hand Value: "+Integer.toString(bj.getPlayerValue()));//get from the model the player hand in text and set it to its proper field in the view
 			playerVal.setText("Player hand: "+Integer.toString(bj.getPlayerValue()));//same but with value
 			dealerVal.setText("Dealer Hand");
-			appendPicToHand(bj.getPlayerCards(),cardHand); 
+			appendPicToHandAnimated(bj.getPlayerCards(),"player");
+			cardsFlow.play();
+			cardsFlow = new SequentialTransition();
 			MsgBox.appendText("\nDealer Hand:\n"+bj.getHand(false));	
-			appendPicToHand(bj.getDealerCards(),dealerCard);
+			appendPicToHandAnimated(bj.getDealerCards(),"dealer");
+			cardsFlow.play();
+			cardsFlow = new SequentialTransition();
 			turnScore.setText("Current Turn Score: "+Integer.toString(bj.getTurnScore()));
 			btnSetting[1]=true;//enable hit.
 			btnSetting[2]=true;//enable stand.
@@ -128,7 +143,9 @@ public class ControllerFX  implements Initializable, ControlledScreen {
 		if(btnSetting[1])
 		{
 			Card c = bj.playerDraw();
-			appendSinglePic(c, this.cardHand);
+			appendSinglePicAnimated(c, "player");
+			cardsFlow.play();
+			cardsFlow = new SequentialTransition();
 			MsgBox.appendText("\nPlayer Draw: "+c.toString()+"\nHand value:"+bj.getPlayerValue());
 			playerVal.setText("\nPlayer hand: "+Integer.toString(bj.getPlayerValue()));
 			turnScore.setText("Current Turn Score: "+Integer.toString(bj.getTurnScore()));
@@ -163,6 +180,15 @@ public class ControllerFX  implements Initializable, ControlledScreen {
 		// TODO Auto-generated method stub
 		btnSetting = new boolean[]{true,false,false,true};
 		bj.nextTurn();
+		for (Node n : myController.getChildren()) {
+			if(n.toString().contains("ImageView") )
+				animateOut(n);
+		}
+		
+		
+		dealerPosOffset = -50;
+		playerPosOffset = -50;
+		flagFlippedCard = true;
 	}
 	
 	@FXML
@@ -175,16 +201,47 @@ public class ControllerFX  implements Initializable, ControlledScreen {
 			dealerVal.setText("Dealer hand: "+Integer.toString(bj.getDealerValue()));
 			bj.showAllDealerCards();
 			MsgBox.appendText("\nDealer Hand:\n"+bj.getHand(false));
-			dealerCard.getChildren().clear();
-			appendPicToHand2(bj.getDealerCards(),dealerCard);
+			
+			//appendPicToHandAnimated(bj.getDealerCards(),"dealer");
+			//cardsFlow.play();
+			//cardsFlow = new SequentialTransition();
 			while(bj.getDealerValue()<17)
 			{
 				Card c = bj.dealerDraw();
-				appendSinglePic(c, dealerCard);
+				appendSinglePicAnimated(c, "dealer");
+				
+				
+				cardsFlow.play();
+				cardsFlow = new SequentialTransition();
 				dealerVal.setText("Dealer hand: "+Integer.toString(bj.getDealerValue()));
 				MsgBox.appendText("\nDealer Draw: "+c.toString()+"\nhand value:"+bj.getDealerValue());
 			}
 			bj.checkVictory(MsgBox);
+			flipCardAnimated();
+			
+			cardsFlow.play();
+			
+			cardsFlow = new SequentialTransition();
+			/*
+			cardsFlow.setOnFinished(new EventHandler<ActionEvent>() {
+				
+				
+				@Override
+	            public void handle(ActionEvent event) {
+					btnSetting = new boolean[]{true,false,false,true};
+					bj.nextTurn();
+					for (Node n : myController.getChildren()) {
+						if(n.toString().contains("ImageView") )
+							animateOut(n);
+					}
+					
+					
+					dealerPosOffset = -50;
+					playerPosOffset = -50;
+					flagFlippedCard = true;
+				}
+				
+			});*/
 			resetController();
 			
 		}else{
@@ -194,6 +251,35 @@ public class ControllerFX  implements Initializable, ControlledScreen {
 	}
 	
 	
+	private void flipCardAnimated() {
+		Image cardFace = new Image(cardToFlip.getImageLocation(),true);
+		//double x = card.getWidth();
+		//double y = card.getHeight();
+		RotateTransition rotationY = new RotateTransition();
+        rotationY.setAxis( Rotate.Y_AXIS );
+        rotationY.setDuration( Duration.seconds(1));
+        rotationY.setByAngle( 90 );
+        rotationY.setNode( imageToFlip );
+        rotationY.setCycleCount(1);
+        rotationY.setOnFinished(new EventHandler<ActionEvent>() {
+        	
+            @Override
+            public void handle(ActionEvent event) {
+            		Image i = new Image("/view/fxml/img/CardBack.png");
+            		imageToFlip.setImage(i);
+            		rotationY.setByAngle(-90);
+            		rotationY.setOnFinished(null);
+            		
+            		
+            }
+        });
+        
+		imageToFlip.setImage(cardFace);
+	   
+	    
+	    cardsFlow.getChildren().add(rotationY);
+		
+	}
 	@FXML
 	public void btnQuitListener(ActionEvent evnt)
 	{
@@ -205,27 +291,9 @@ public class ControllerFX  implements Initializable, ControlledScreen {
 	
 	
 
-	/**
-	 * this function receives a player or dealer(!) hand, and a reference to the HBOX that will display it.
-	 * and append the picture of the card to the HBox on the board.
-	 * @param playerCards
-	 * @param hb
-	*/
-	private void appendPicToHand(ArrayList<Card> playerCards,HBox hb) {
-		for(Card c : playerCards){			
-			
-				appendSinglePic(c,hb);	
-		}
-	}
-	
 
 	
-	private void appendPicToHand2(ArrayList<Card> playerCards,HBox hb) {
-		for(Card c : playerCards){
-			appendSinglePic2(c,hb);
-		}
-	}
-	
+
 	private void appendSinglePic(Card c, HBox hb)  {
 	
 		ImageView iv1 = new ImageView();
@@ -280,18 +348,81 @@ public class ControllerFX  implements Initializable, ControlledScreen {
 	    
 	}
 	
-	
-	
-	private void appendSinglePic2(Card c, HBox hb) {
-		ImageView iv1 = new ImageView();
-		Image card = new Image(c.getImageLocation(), true);
-		iv1.setImage(card);
-		hb.setSpacing(-40);
 
-		hb.getChildren().add(iv1);
+	/**
+	 * this function receives a player or dealer(!) hand, and type of hand to move cards
+	 * and append the picture of the card to the ImageView
+	 * @param playerCards
+	 * @param hb
+	*/
+private void appendPicToHandAnimated(ArrayList<Card> playerCards,String handString) {
+		for(Card c : playerCards){
+			ImageView iv = new ImageView();
+			Image card = new Image("/view/fxml/img/CardBack.png", true);
+			iv.setImage(card);
+			if(flagFlippedCard && handString.equals("dealer"))
+			{
+				imageToFlip = iv;
+				cardToFlip = c;
+				flagFlippedCard = false;
+			}
+			myController.getChildren().add(iv);
+	
+			animatePlayerCard(iv,c,handString,1200);
+	
+		}
 	}
 	
+private void animatePlayerCard(ImageView iv ,Card c,String hand,double speed){
 	
+		
+		
+		Path path = new Path();
+		if(hand.equals("player"))
+		{ 
+			
+	        path.getElements().add(new MoveTo(500,-500));
+	        path.getElements().add(new CubicCurveTo(360,-200, 250, 130, playerPosOffset, 120));
+	        playerPosOffset+=30;
+	      
+		}
+		else
+		{
+			path.getElements().add(new MoveTo(500,-500));
+	        path.getElements().add(new CubicCurveTo(360, -200, 200, -90, dealerPosOffset, -100));
+	        dealerPosOffset +=30;
+		}
+        PathTransition pathTransition = new PathTransition();
+       
+        pathTransition.setDuration(Duration.millis(speed));
+        pathTransition.setPath(path);
+        pathTransition.setNode(iv);
+        pathTransition.setOrientation(PathTransition.OrientationType.ORTHOGONAL_TO_TANGENT);
+    
+        Image card = new Image(c.getImageLocation(), true);
+        iv.setImage(card);
+        cardsFlow.getChildren().add(pathTransition);
+	}
+	
+	private void appendSinglePicAnimated(Card c, String hand) {
+		ImageView iv = new ImageView();
+		Image card = new Image(c.getImageLocation(), true);
+		iv.setImage(card);   
+		myController.getChildren().add(iv);
+		animatePlayerCard(iv, c, hand,200);
+	
+		
+		
+	}
+	
+	private void animateOut(Node n)
+	{
+		TranslateTransition translateTransition =
+	            new TranslateTransition(Duration.millis(500), n);
+	        
+	        translateTransition.setToY(500);
+	        translateTransition.play();
+	}
 	
 	
 	

@@ -61,6 +61,5 @@
             <Font size="24.0" />
          </font>
       </Label>
-      <Label fx:id="labelDeck" layoutX="695.0" layoutY="77.0" text="Label" />
    </children>
 </AnchorPane>
