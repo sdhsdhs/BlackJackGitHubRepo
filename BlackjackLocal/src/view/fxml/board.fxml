@@ -46,5 +46,21 @@
             <InnerShadow />
          </effect>
       </TextArea>
+      <Label fx:id="totalScore" layoutX="50.0" layoutY="283.0" prefHeight="50.0" prefWidth="160.0" text="Total Score" textFill="#030303">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <Label fx:id="turnScore" layoutX="50.0" layoutY="209.0" prefHeight="50.0" prefWidth="160.0" text="Turn Score" textFill="#030303">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <Label fx:id="turn" alignment="CENTER" contentDisplay="CENTER" layoutX="263.0" layoutY="215.0" prefHeight="60.0" prefWidth="214.0" text="Turn" textAlignment="CENTER">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Label fx:id="labelDeck" layoutX="695.0" layoutY="77.0" text="Label" />
    </children>
 </AnchorPane>

@@ -21,6 +21,9 @@ public class BlackjackGame // model class
 	private Deck deck;
 	private boolean playerBurn;
 	private boolean dealerBurn;
+	private int turn;
+	private int turnScore;
+	private int Totalscore;
 
 	public BlackjackGame() {
 		dealer = new DealerHand();// dealer hand-rules differ in class the itself
@@ -29,6 +32,9 @@ public class BlackjackGame // model class
 		dealerBurn=false;
 		deck = new Deck();
 		deck.shuffle();//we directly shuffle the deck we don't want any errors.
+		turnScore=0;
+		Totalscore=0;
+		turn=0;
 	}
 	
 	/**
@@ -81,7 +87,9 @@ public class BlackjackGame // model class
 		for (int i = 0; i < 2; i++)
 			dealer.AddCard(deck.deal());
 		
-
+		turnScore=0;
+		dealerBurn=false;
+		playerBurn=false;
 	}
 	
 	/**
@@ -131,20 +139,90 @@ public class BlackjackGame // model class
 	 * not yet fully implemented, will be for iteration 2.
 	 */
 	public void checkVictory(TextArea msgBox) {
+		
 		if (dealer.handValue() > 21) {
+			setDealerBurn();
 			msgBox.appendText("\nDealer burns Player wins");
+			msgBox.appendText("\n--------------------------");
+			msgBox.appendText("\nPress Deal to play again.");
+			calculateTurnScore();
+			updateTotalScore();
 			return;
 		}
 		if (dealer.handValue() >= player.handValue()) {
 			msgBox.appendText("\nDealer: "+dealer.handValue()+"\nPlayer:"+player.handValue()+"\n**Dealer Wins**" );
+			msgBox.appendText("\n--------------------------");
+			msgBox.appendText("\nPress Deal to play again.");
+			calculateTurnScore();
+			updateTotalScore();
 			
 			return;
 		} else{
 			msgBox.appendText("\nDealer: "+dealer.handValue()+"\nPlayer:"+player.handValue()+"\n**Player Wins**" );
+			msgBox.appendText("\n--------------------------");
+			msgBox.appendText("\nPress Deal to play again.");
+			calculateTurnScore();
+			updateTotalScore();
 			return;
 		}
 	}
-
+	
+	public void updateScores()
+	{
+		calculateTurnScore();
+		updateTotalScore();
+	}
+	
+	public void nextTurn()
+	{
+		this.dealer.clearHand();
+		this.player.clearHand();
+		this.turnScore=0;
+		this.deck = new Deck();
+		deck.shuffle();
+		try {
+			this.beginGame();
+		} catch (EmptyDeckException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public int getTurn(){
+		return this.turn;
+	}
+	public void incTurn()
+	{
+		this.turn++;
+	}
+	
+	private void calculateTurnScore(){
+		//calculate value
+		if(turn%2==0)
+			this.turnScore = getPlayerValue()*2;
+		else
+			this.turnScore = getPlayerValue()*3;
+		
+	}// calculate value.
+	
+	private void updateTotalScore()
+	{
+		//if negative is penalty 
+		if(playerBurn || (player.handValue()<=dealer.handValue() && !dealerBurn))
+			this.turnScore*=-1;	
+		
+		this.Totalscore+=this.turnScore;
+	}
+	
+	public int getTotalScore(){
+		return this.Totalscore;
+	}
+	
+	public int getTurnScore(){
+		calculateTurnScore();
+		return this.turnScore;
+	}
+	
 	public void setPlayerBurn() {
 		this.playerBurn=true;
 	}
