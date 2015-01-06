@@ -61,10 +61,11 @@
             <Font name="System Bold" size="25.0" />
          </font>
       </Label>
-      <Label fx:id="msgLabel" layoutX="295.0" layoutY="540.0" prefHeight="60.0" prefWidth="280.0" textFill="WHITE">
+      <Label fx:id="msgLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="268.0" layoutY="540.0" prefHeight="60.0" prefWidth="280.0" textAlignment="CENTER" textFill="WHITE">
          <font>
             <Font size="18.0" />
          </font>
       </Label>
+      <Button fx:id="btnReset" layoutX="71.0" layoutY="275.0" mnemonicParsing="false" onAction="#btnResetListener" text="Reset Game" />
    </children>
 </AnchorPane>
