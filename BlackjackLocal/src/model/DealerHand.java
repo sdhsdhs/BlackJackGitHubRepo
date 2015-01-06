@@ -17,6 +17,7 @@ public class DealerHand implements BasicHand{
 	public DealerHand(){
 		this.hand = new ArrayList<Card>();
 	}
+	boolean hasAce=false;
 	/**
 	 * major function: this function calculates the value of all the cards in the hand.
 	 * the Logic for the calculation is as followed: add card value as is expect in aces then set to 1 or 11 as best fit.
@@ -25,26 +26,24 @@ public class DealerHand implements BasicHand{
 	@Override
 	public int handValue() {
 		short value = 0;
-		boolean hasAce=false;
 		for(Card c : hand)
 		{
 			if(c.getRank().equals(Rank.ACE))//enforce logic: Ace value for dealer 1 or 11 based on hand value.
 			{
 					if(value+c.getValue() > 21)
 						value+=1;
-					else
+					else{
 						value+=c.getValue();
-				hasAce=true;
+						
+					}
+				
 			}
 			else
 			{
-						value+=c.getValue();
+				value+=c.getValue();
 			}
 		}
-		if(hasAce && value>21)
-			return (value-10); //critical line: If First Ace valued 11 and following cards passed 21,this line enforce the Ace to be equal 1.
-		else
-			return value;
+		return value;
 	}
 	
 	/*
@@ -110,6 +109,17 @@ public class DealerHand implements BasicHand{
 		for(Card c : hand)
 			if(!c.faceUp())
 				c.flip();
+	}
+	/**
+	 * this function checks if dealer hit soft 17.
+	 * @return true if dealer openning hand contains a Six and an Ace.
+	 */
+	public boolean isSoft17(){
+		if(this.hand.size()==2)
+			if(hand.get(0).getRank().equals(Rank.ACE)|| hand.get(1).getRank().equals(Rank.ACE))
+				if(hand.get(0).getRank().equals(Rank.SIX)|| hand.get(1).getRank().equals(Rank.SIX))
+					return true;
+		return false;
 	}
 	
 	@Override

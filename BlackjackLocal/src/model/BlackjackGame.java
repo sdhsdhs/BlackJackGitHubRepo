@@ -2,8 +2,7 @@ package model;
 
 import java.util.ArrayList;
 
-import javafx.scene.control.TextArea;
-
+import javafx.scene.control.Label;
 import model.Deck.EmptyDeckException;
 
 
@@ -17,13 +16,13 @@ import model.Deck.EmptyDeckException;
 public class BlackjackGame // model class
 {
 	private DealerHand dealer;//the dealer
-	private PlayerHand player;//dear mr. player may the odds always be in your favor.
+	private PlayerHand player;//dear Mr. player may the odds always be in your favor.
 	private Deck deck;
 	private boolean playerBurn;
 	private boolean dealerBurn;
 	private int turn;
-	private int turnScore;
-	private int Totalscore;
+	private int turnScore;// the hand value during the draw phase
+	private int Totalscore;//the total score of the player up untill current round/
 
 	public BlackjackGame() {
 		dealer = new DealerHand();// dealer hand-rules differ in class the itself
@@ -129,6 +128,9 @@ public class BlackjackGame // model class
 		return dealer.getLastCard();
 	}
 	
+	/**
+	 * set all the cards to be faced up in dealer hand
+	 */
 	public void dealerRevelCard()
 	{
 		dealer.faceUpCards();
@@ -136,66 +138,91 @@ public class BlackjackGame // model class
 	
 	/**
 	 * function compare which has the best hand
-	 * not yet fully implemented, will be for iteration 2.
+	 * and send the corresponding msg.
 	 */
-	public void checkVictory(TextArea msgBox) {
+	public void checkVictory(Label resultLable,Label msgLabel) {
 		
 		if (dealer.handValue() > 21) {
 			setDealerBurn();
-			msgBox.appendText("\nDealer burns Player wins");
-			msgBox.appendText("\n--------------------------");
-			msgBox.appendText("\nPress Deal to play again.");
+			
+			msgLabel.setText("Press Deal to play again.");
+			resultLable.setText("Player Win");
 			calculateTurnScore();
 			updateTotalScore();
 			return;
 		}
 		if (dealer.handValue() >= player.handValue()) {
-			msgBox.appendText("\nDealer: "+dealer.handValue()+"\nPlayer:"+player.handValue()+"\n**Dealer Wins**" );
-			msgBox.appendText("\n--------------------------");
-			msgBox.appendText("\nPress Deal to play again.");
+			
+			msgLabel.setText("Press Deal to play again.");
+			resultLable.setText("Dealer Win");
 			calculateTurnScore();
 			updateTotalScore();
-			
 			return;
 		} else{
-			msgBox.appendText("\nDealer: "+dealer.handValue()+"\nPlayer:"+player.handValue()+"\n**Player Wins**" );
-			msgBox.appendText("\n--------------------------");
-			msgBox.appendText("\nPress Deal to play again.");
+			
+			msgLabel.setText("Press Deal to play again.");
+			resultLable.setText("Player Win");
 			calculateTurnScore();
 			updateTotalScore();
 			return;
 		}
 	}
 	
+	/**
+	 * call the function to undate the scores.
+	 */
 	public void updateScores()
 	{
 		calculateTurnScore();
 		updateTotalScore();
 	}
 	
+	/**
+	 * check if dealer has hit soft 17
+	 * @return true if so and False any other case
+	 */
+	public boolean dealerSoft17()
+	{
+		return dealer.isSoft17();
+	}
+	
+	/**
+	 * set's the game logic ready for next turn
+	 */
 	public void nextTurn()
 	{
 		this.dealer.clearHand();
 		this.player.clearHand();
 		this.turnScore=0;
-		this.deck = new Deck();
+		this.deck = new Deck();//we use a new deck each round because we are professional :D
 		deck.shuffle();
 		try {
 			this.beginGame();
 		} catch (EmptyDeckException e) {
-			// TODO Auto-generated catch block
+			System.out.println("Next turn Failed.");
 			e.printStackTrace();
 		}
 	}
 	
+	/**
+	 * common you can guess what this does.
+	 * @return
+	 */
 	public int getTurn(){
 		return this.turn;
 	}
+	/**
+	 * increment the turn count.
+	 */
 	public void incTurn()
 	{
 		this.turn++;
 	}
 	
+	/**
+	 *Logic: odd round the hand value is tripled.
+	 *even round hand value is doubled.
+	 */
 	private void calculateTurnScore(){
 		//calculate value
 		if(turn%2==0)
@@ -205,6 +232,9 @@ public class BlackjackGame // model class
 		
 	}// calculate value.
 	
+	/**
+	 * add's the current turn score to the total score the sign is depending on player win or lose
+	 */
 	private void updateTotalScore()
 	{
 		//if negative is penalty 
@@ -213,13 +243,13 @@ public class BlackjackGame // model class
 		
 		this.Totalscore+=this.turnScore;
 	}
-	
+	//getter setters...
 	public int getTotalScore(){
 		return this.Totalscore;
 	}
 	
 	public int getTurnScore(){
-		calculateTurnScore();
+		calculateTurnScore();//get current.
 		return this.turnScore;
 	}
 	
