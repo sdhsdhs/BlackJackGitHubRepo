@@ -6,7 +6,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({ TestDeck.class, TestHandValue.class,
-		TestIndividualCardValue.class })
+		TestIndividualCardValue.class, TestSoft17.class })
 public class AllTests {
 
 }

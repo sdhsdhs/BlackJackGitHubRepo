@@ -5,16 +5,18 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 
 
+
 import model.Card;
 import model.Deck;
-
 
 
 import org.junit.Test;
 
 public class TestDeck {
 	Deck d = new Deck();
-	
+	/**
+	 * test to check all cards can be drawn.
+	 */
 	@Test
 	public void testDealAllCards() {
 		d.reuseDeck();
@@ -49,7 +51,9 @@ public class TestDeck {
 		}
 	}
 	
-	
+	/**
+	 * test of randomness of shuffle.
+	 */
 	@Test
 	public void testRandmoness()
 	{

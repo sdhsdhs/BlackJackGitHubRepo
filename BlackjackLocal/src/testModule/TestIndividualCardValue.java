@@ -8,6 +8,9 @@ import org.junit.Test;
 
 public class TestIndividualCardValue {
 	private Deck d = new Deck();
+	/**
+	 * test of value of each card by dealing an entire deck.
+	 */
 	@Test
 	public void testGetValue() {
 		try{
@@ -39,7 +42,7 @@ public class TestIndividualCardValue {
 			
 		}catch(Exception e)
 		{
-			//TODO
+			e.printStackTrace();
 		}
 	}
 
