@@ -5,16 +5,12 @@ package controller;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
-
 import model.BlackjackGame;
 import model.Card;
 import model.Deck.EmptyDeckException;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
 import javafx.animation.PathTransition;
 import javafx.animation.RotateTransition;
 import javafx.animation.SequentialTransition;
-import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -23,12 +19,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
+
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
 import javafx.scene.shape.CubicCurveTo;
-import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.transform.Rotate;
@@ -39,34 +33,31 @@ import javafx.util.Duration;
  *it has a reference to the game, and is the defined controller in the view
  *in accordance to javaFX rules.(the controller is defined in the view not the other way around)
  */
-public class ControllerFX  implements Initializable, ControlledScreen {
+public class ControllerFX implements Initializable, ControlledScreen {
 
 	
 	private BlackjackGame bj; //reference to model
 	@FXML 
-	private TextArea MsgBox; //the player hand text that will show the hand in text in the view
-	
-	@FXML 
 	private javafx.scene.control.Label playerVal;//will show the player hand value in the view
+	@FXML
+	private javafx.scene.control.Label dealerVal; //label of dealer hand value.
+	@FXML
+	private Label turnScore; //total hand current value
+	@FXML
+	private Label totalScore;//total value all rounds played.
+	@FXML
+	private Label turn;//current turn
+	@FXML
+	private Label resultLable;
+	@FXML
+	private Label msgLabel;
 
-	@FXML 
-	private javafx.scene.control.Label DealerVal;
-	@FXML
-	private javafx.scene.control.Label dealerVal;
-	@FXML
-	private Label turnScore;
-	@FXML
-	private Label totalScore;
-	@FXML
-	private Label turn;
-	@FXML
-	private Label labelDeck;
 	
 
-	private ScreenController myController;
+	private ScreenController myController;//for start animation purpose's.
 	
-	private double dealerPosOffset = -50;
-	private double playerPosOffset = -50;
+	private double dealerPosOffset = -50;//for dealer hand Images position.
+	private double playerPosOffset = -50;//for player hand Images position.
 	
 	SequentialTransition cardsFlow = new SequentialTransition();
 	
@@ -74,315 +65,279 @@ public class ControllerFX  implements Initializable, ControlledScreen {
 	Card cardToFlip;
 	boolean flagFlippedCard = true;
 	
-	private boolean[] btnSetting;
+	private boolean[] btnSetting;//array to control buttons availability.
 	
-	/*
+	/**
 	 * the constructor with a reference to a game(the model).
 	 */
 	public ControllerFX() throws EmptyDeckException {
-		//round =0;
+		
 		this.bj = new BlackjackGame();
 		bj.beginGame();
 		btnSetting = new boolean[]{true,false,false,true};
 	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see javafx.fxml.Initializable#initialize(java.net.URL, java.util.ResourceBundle)
 	 */
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		MsgBox.setEditable(false);
-		MsgBox.setOpacity(1);
+
 	}
 	
-	/**
-	 * 
-	 * @return the current round.
-	
-	public int getRound(){
-		return this.round;
-	}
-	*/
 	
 	/**
 	 * this function is the listener to the view DEAL button.
-	 * it set the text of the hands to their appropriate field in the view.
-	 * this function works only on round 0;
-	 * @param evnt
+	 * it set the Images of the hands to their appropriate position in the Stage.
+	 * 
+	 * @param evnt the event of button press.
 	 */
 	@FXML
 	public void btnDealListener(ActionEvent evnt){
 		
 		if(btnSetting[0]){
-			MsgBox.clear();
+			//clear the board
+			resetController();
+			for (Node n : myController.getChildren()) 
+			{
+				if(n.toString().contains("ImageView") )
+					animateOut(n);
+			}
+			
+			//start new turn
+			btnSetting[0]=false;// deal no longer available.
 			bj.incTurn();
 			turn.setText("Round: "+Integer.toString(bj.getTurn()));
 			totalScore.setText("Total Score: "+Integer.toString(bj.getTotalScore()));
-			btnSetting[0]=false;
-			MsgBox.setText("Player Hand:\n"+bj.getHand(true)+"Hand Value: "+Integer.toString(bj.getPlayerValue()));//get from the model the player hand in text and set it to its proper field in the view
-			playerVal.setText("Player hand: "+Integer.toString(bj.getPlayerValue()));//same but with value
+			playerVal.setText("Player hand");
 			dealerVal.setText("Dealer Hand");
-			appendPicToHandAnimated(bj.getPlayerCards(),"player");
+			//set the animation of the cards flow to Player.
+			appendPicToHandAnimated(bj.getPlayerCards(),"player"); 
+			cardsFlow.setOnFinished(new EventHandler<ActionEvent>() { //make sure the hand value display only after cards. 
+	            @Override
+	            public void handle(ActionEvent event) {
+	            	playerVal.setText("Player hand: "+Integer.toString(bj.getPlayerValue()));
+	            }
+			});
 			cardsFlow.play();
+			//reset the transition and make the Dealer flow animation.
 			cardsFlow = new SequentialTransition();
-			MsgBox.appendText("\nDealer Hand:\n"+bj.getHand(false));	
 			appendPicToHandAnimated(bj.getDealerCards(),"dealer");
 			cardsFlow.play();
 			cardsFlow = new SequentialTransition();
 			turnScore.setText("Current Turn Score: "+Integer.toString(bj.getTurnScore()));
 			btnSetting[1]=true;//enable hit.
 			btnSetting[2]=true;//enable stand.
-		}else{
-			MsgBox.appendText("\nDeal not availble.");
+		}else{//deal not available display msg
+			
+			msgLabel.setText("Deal Not Availble");
 		}
-	}
+	}//end of deal listener
 	
+	/**
+	 * this function Deals a card from the deck to the player.
+	 * It also fire the animation the the View.
+	 * @param evnt
+	 * @throws EmptyDeckException
+	 */
 	@FXML
 	public void btnHitListener(ActionEvent evnt) throws EmptyDeckException
 	{
 		if(btnSetting[1])
 		{
 			Card c = bj.playerDraw();
-			appendSinglePicAnimated(c, "player");
-			cardsFlow.play();
-			cardsFlow = new SequentialTransition();
-			MsgBox.appendText("\nPlayer Draw: "+c.toString()+"\nHand value:"+bj.getPlayerValue());
-			playerVal.setText("\nPlayer hand: "+Integer.toString(bj.getPlayerValue()));
+			appendSinglePicAnimated(c, "player"); //prepare the animation.
+			cardsFlow.play();//fire the animation.
+			cardsFlow = new SequentialTransition();//reset the animation.
+		
+			playerVal.setText("Player hand: "+Integer.toString(bj.getPlayerValue()));
 			turnScore.setText("Current Turn Score: "+Integer.toString(bj.getTurnScore()));
-			if(bj.getPlayerValue()==21){
-				MsgBox.appendText("\nyou have 21 dealer draws:");
+			if(bj.getPlayerValue()==21){//Case Player have 21 now turn move to dealer.
+				
 				btnStandListener(evnt);
 			}
-			
+			//case Player Burn.
 			if(bj.getPlayerValue()>21)
 			{
+				btnSetting[0]=true;
 				btnSetting[2]=false;
 				btnSetting[1]=false;
 				bj.setPlayerBurn();
 				bj.updateScores();
-				MsgBox.appendText("\n**Player Burns, Dealer Win**");
-				resetController();
-				MsgBox.appendText("\n--------------------------");
-				MsgBox.appendText("\nPress Deal to play again.");
-				
+			
+				msgLabel.setText("Press Deal to play again.");
+				resultLable.setText("Dealer Win");
 			}
-		}else if(bj.getPlayerBurn())
+		}else if(bj.getPlayerBurn()) //case Player Burned and hit.
 				{
-					MsgBox.setText("\nCan't Hit You Burned.");
-					MsgBox.appendText("\n--------------------------");
-					MsgBox.appendText("\nPress Deal to play again.");
+					msgLabel.setText("You Burned press Deal or Quit");
+					
 				}else{
-					MsgBox.setText("\nbutton HIT not availble at this stage.");
+				
+					msgLabel.setText("HIT not availble");
 				}
-	}
+	}//end of hit listener
 	
+	/**
+	 * this function reset the View and Model to the base Position
+	 */
 	private void resetController() {
-		// TODO Auto-generated method stub
+		
 		btnSetting = new boolean[]{true,false,false,true};
 		bj.nextTurn();
-		for (Node n : myController.getChildren()) {
-			if(n.toString().contains("ImageView") )
-				animateOut(n);
-		}
-		
-		
 		dealerPosOffset = -50;
 		playerPosOffset = -50;
 		flagFlippedCard = true;
+		resultLable.setText("");
+		msgLabel.setText("");
 	}
 	
+	/**
+	 * this function is the reaction to Stand button pressing
+	 * it revel the dealer Cards and if he needs he draws
+	 * it also fire the corresponding animations.
+	 * @param evnt
+	 * @throws EmptyDeckException
+	 */
 	@FXML
 	public void btnStandListener(ActionEvent evnt) throws EmptyDeckException
 	{
 		if(btnSetting[2])
-		{
+		{	
+			//unable Stand and Hit.
 			btnSetting[2]=false;
 			btnSetting[1]=false;
-			dealerVal.setText("Dealer hand: "+Integer.toString(bj.getDealerValue()));
-			bj.showAllDealerCards();
-			MsgBox.appendText("\nDealer Hand:\n"+bj.getHand(false));
 			
-			//appendPicToHandAnimated(bj.getDealerCards(),"dealer");
-			//cardsFlow.play();
-			//cardsFlow = new SequentialTransition();
+			dealerVal.setText("Dealer hand: "+Integer.toString(bj.getDealerValue()));//show value
+			bj.showAllDealerCards();//make the card apparent.
+			ArrayList<Card> addedCards = new ArrayList<Card>();
+			//if dealer has soft 17 he draws a card and then continue as usual.
+			if(bj.dealerSoft17())
+			{
+				Card c = bj.dealerDraw();
+				addedCards.add(c);
+				
+				cardsFlow = new SequentialTransition();
+				
+			}
+			//dealer draws until he has 17 or more.
 			while(bj.getDealerValue()<17)
 			{
 				Card c = bj.dealerDraw();
-				appendSinglePicAnimated(c, "dealer");
-				
-				
-				cardsFlow.play();
+				addedCards.add(c);
 				cardsFlow = new SequentialTransition();
-				dealerVal.setText("Dealer hand: "+Integer.toString(bj.getDealerValue()));
-				MsgBox.appendText("\nDealer Draw: "+c.toString()+"\nhand value:"+bj.getDealerValue());
+				
 			}
-			bj.checkVictory(MsgBox);
-			flipCardAnimated();
-			
-			cardsFlow.play();
-			
-			cardsFlow = new SequentialTransition();
-			/*
+			//make the animation happen
+			flipCardAnimated();  
+			flipCardAnimated();//that isn't a mistake the double call is needed.
+			appendPicToHandAnimated(addedCards,"dealer");
+			//set on the end of animation actions
 			cardsFlow.setOnFinished(new EventHandler<ActionEvent>() {
-				
-				
-				@Override
-	            public void handle(ActionEvent event) {
-					btnSetting = new boolean[]{true,false,false,true};
-					bj.nextTurn();
-					for (Node n : myController.getChildren()) {
-						if(n.toString().contains("ImageView") )
-							animateOut(n);
-					}
-					
-					
-					dealerPosOffset = -50;
-					playerPosOffset = -50;
-					flagFlippedCard = true;
-				}
-				
-			});*/
-			resetController();
+            @Override
+            public void handle(ActionEvent event) {
+            	dealerVal.setText("Dealer hand: "+Integer.toString(bj.getDealerValue()));//display dealer total hand value
+            	bj.checkVictory(resultLable,msgLabel);//check who wins and display msg.
+            	btnSetting[0]=true;//enable deal
+            }
+			});
+			cardsFlow.play();		
+			cardsFlow = new SequentialTransition();
 			
 		}else{
-			MsgBox.setText("\nbutton STAND not availble at this stage.");
+			if(bj.getPlayerBurn())
+			{	msgLabel.setText("Can't Stand You Burned.");
+				
+			}
+			else{
+				
+				msgLabel.setText("STAND not availble");
+			}
 			
 		}
-	}
+	}//end of stand listener
 	
-	
+	/**
+	 * this function make the magic of flip animation happen.
+	 */
 	private void flipCardAnimated() {
-		Image cardFace = new Image(cardToFlip.getImageLocation(),true);
-		//double x = card.getWidth();
-		//double y = card.getHeight();
+		Image cardFace = new Image("/view/fxml/img/CardBack.png",true);	
 		RotateTransition rotationY = new RotateTransition();
         rotationY.setAxis( Rotate.Y_AXIS );
-        rotationY.setDuration( Duration.seconds(1));
+        rotationY.setDuration( Duration.millis(200));
         rotationY.setByAngle( 90 );
         rotationY.setNode( imageToFlip );
-        rotationY.setCycleCount(1);
+        rotationY.setCycleCount(1); 
         rotationY.setOnFinished(new EventHandler<ActionEvent>() {
         	
             @Override
             public void handle(ActionEvent event) {
-            		Image i = new Image("/view/fxml/img/CardBack.png");
+            		Image i = new Image(cardToFlip.getImageLocation());
             		imageToFlip.setImage(i);
             		rotationY.setByAngle(-90);
             		rotationY.setOnFinished(null);
-            		
-            		
             }
         });
         
 		imageToFlip.setImage(cardFace);
-	   
-	    
-	    cardsFlow.getChildren().add(rotationY);
-		
+	    cardsFlow.getChildren().add(rotationY);//add the rotation to the sequence
 	}
+	
+	/**
+	 * this incredibly complicated method set the most complex mechanism of the entire app
+	 * it closes the app.
+	 * crazy i know..
+	 * @param evnt-the Big Bang!! no just kidding only a button QUIT press...
+	 */
 	@FXML
 	public void btnQuitListener(ActionEvent evnt)
 	{
 		if(btnSetting[3])
 		{
-			Platform.exit();
+			Platform.exit();//yea that's all it takes. and may the force be with you.
 		}
 	}
-	
-	
-
 
 	
-
-	private void appendSinglePic(Card c, HBox hb)  {
-	
-		ImageView iv1 = new ImageView();
-		Image card = new Image(c.getImageLocation(), true);
-		Image cardBack = new Image("/view/fxml/img/CardBack.png",true);
-		//double x = card.getWidth();
-		//double y = card.getHeight();
-		RotateTransition rotationY = new RotateTransition();
-        rotationY.setAxis( Rotate.Y_AXIS );
-        rotationY.setDuration( Duration.seconds(1));
-        rotationY.setByAngle( 90 );
-        rotationY.setNode( iv1 );
-        rotationY.setCycleCount(1);
-        rotationY.setOnFinished(new EventHandler<ActionEvent>() {
-        	
-            @Override
-            public void handle(ActionEvent event) {
-            		iv1.setImage(card);
-            		rotationY.setByAngle(-90);
-            		rotationY.setOnFinished(null);
-            		rotationY.play();
-            		
-            }
-        });
-        
-		iv1.setImage(cardBack);
-	    hb.getChildren().add(iv1);
-	    hb.setSpacing(-40);
-	    
-	    rotationY.play();
-	    Path path = new Path();
-	   // x=labelDeck.getScaleX();
-	  //  y=labelDeck.getScaleY();
-	  //  System.out.println("("+x+" , "+y+")");
-	    MoveTo start = new MoveTo(400,0);
-	    LineTo end = new LineTo(hb.getScene().getX()+23, hb.getScene().getY()+23);//checked view to correct position error.
-	    path.getElements().add(start);
-	    path.getElements().add(end);
-	    PathTransition trans = new PathTransition();
-	    trans.setDuration(Duration.millis(1500));
-	    trans.setNode(iv1);
-	    trans.setPath(path);
-	    trans.setOnFinished(new EventHandler<ActionEvent>() {
-        	
-            @Override
-            public void handle(ActionEvent event) {
-            	//	System.out.println("DFHAS");    		
-            		
-            }
-        });
-	    trans.play();
-	    
-	}
-	
-
 	/**
-	 * this function receives a player or dealer(!) hand, and type of hand to move cards
-	 * and append the picture of the card to the ImageView
+	 * this function make the magic of adding cards animation to happen.
+	 * it gets an arrayList of cards and the name of the player or dealer for position.
+	 * 
 	 * @param playerCards
-	 * @param hb
-	*/
-private void appendPicToHandAnimated(ArrayList<Card> playerCards,String handString) {
+	 * @param handString
+	 */
+	private void appendPicToHandAnimated(ArrayList<Card> playerCards,String handString) {
+		//Prepare the ImageView's and add them
 		for(Card c : playerCards){
 			ImageView iv = new ImageView();
 			Image card = new Image("/view/fxml/img/CardBack.png", true);
 			iv.setImage(card);
-			if(flagFlippedCard && handString.equals("dealer"))
+			if(flagFlippedCard && handString.equals("dealer"))//for case of first card not shown
 			{
 				imageToFlip = iv;
 				cardToFlip = c;
 				flagFlippedCard = false;
 			}
-			myController.getChildren().add(iv);
-	
-			animatePlayerCard(iv,c,handString,1200);
-	
+			myController.getChildren().add(iv);			
+			animatePlayerCard(iv,c,handString,900);//make the single animation.
+			}
 		}
-	}
 	
-private void animatePlayerCard(ImageView iv ,Card c,String hand,double speed){
-	
-		
-		
-		Path path = new Path();
-		if(hand.equals("player"))
+	/**
+	 * set the individual animate card.
+	 * @param iv image view of the card Image
+	 * @param c the Card
+	 * @param hand the Hand(Player or dealer)
+	 * @param speed the speed of the transition.
+	 */
+	private void animatePlayerCard(ImageView iv ,Card c,String hand,double speed){
+		Path path = new Path(); 
+		if(hand.equals("player")) //set the position according to player or dealer.
 		{ 
 			
 	        path.getElements().add(new MoveTo(500,-500));
-	        path.getElements().add(new CubicCurveTo(360,-200, 250, 130, playerPosOffset, 120));
+	        path.getElements().add(new CubicCurveTo(360,-200, 250, 130, playerPosOffset, 120));//check function description it's well documented
 	        playerPosOffset+=30;
 	      
 		}
@@ -393,40 +348,43 @@ private void animatePlayerCard(ImageView iv ,Card c,String hand,double speed){
 	        dealerPosOffset +=30;
 		}
         PathTransition pathTransition = new PathTransition();
-       
+        //set the transition
         pathTransition.setDuration(Duration.millis(speed));
         pathTransition.setPath(path);
         pathTransition.setNode(iv);
         pathTransition.setOrientation(PathTransition.OrientationType.ORTHOGONAL_TO_TANGENT);
-    
+        
         Image card = new Image(c.getImageLocation(), true);
         iv.setImage(card);
         cardsFlow.getChildren().add(pathTransition);
-	}
+	}//end of animation.
 	
+	/**
+	 * setter of animation
+	 * @param c
+	 * @param hand
+	 */
 	private void appendSinglePicAnimated(Card c, String hand) {
 		ImageView iv = new ImageView();
 		Image card = new Image(c.getImageLocation(), true);
 		iv.setImage(card);   
 		myController.getChildren().add(iv);
-		animatePlayerCard(iv, c, hand,200);
-	
-		
-		
+		animatePlayerCard(iv, c, hand,600);
 	}
 	
+	/**
+	 * this function clear the board of the Images in the direction of the dealer.
+	 * @param n
+	 */
 	private void animateOut(Node n)
 	{
 		TranslateTransition translateTransition =
 	            new TranslateTransition(Duration.millis(500), n);
 	        
-	        translateTransition.setToY(500);
+	        translateTransition.setToY(-500);//clear card's toward dealer
 	        translateTransition.play();
 	}
-	
-	
-	
-	
+
 	@Override
 	public void setScreenParent(ScreenController screenPage) {
 		myController = screenPage;

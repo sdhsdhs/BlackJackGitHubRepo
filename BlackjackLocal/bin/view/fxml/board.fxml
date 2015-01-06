@@ -30,35 +30,40 @@
          <font>
             <Font name="System Italic" size="12.0" />
          </font></Button>
-      <Button id="stand" fx:id="btnStand" layoutX="459.0" layoutY="437.0" mnemonicParsing="false" onAction="#btnStandListener" text="STAND">
+      <Button id="stand" fx:id="btnStand" layoutX="484.0" layoutY="437.0" mnemonicParsing="false" onAction="#btnStandListener" text="STAND">
          <font>
             <Font name="System Italic" size="12.0" />
          </font></Button>
-      <Label fx:id="playerVal" alignment="TOP_LEFT" layoutX="309.0" layoutY="286.0" prefHeight="39.0" prefWidth="150.0" text="Player:" textFill="WHITE" />
+      <Label fx:id="playerVal" alignment="TOP_LEFT" layoutX="285.0" layoutY="306.0" prefHeight="39.0" prefWidth="150.0" text="Player:" textFill="WHITE" />
       <HBox fx:id="cardHand" layoutX="297.0" layoutY="325.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="100.0" prefWidth="200.0">
          <opaqueInsets>
             <Insets left="-50.0" />
          </opaqueInsets></HBox>
-      <Label fx:id="dealerVal" layoutX="308.0" layoutY="177.0" prefHeight="32.0" prefWidth="200.0" text="Dealer:" textFill="WHITE" />
+      <Label fx:id="dealerVal" layoutX="286.0" layoutY="199.0" prefHeight="32.0" prefWidth="200.0" text="Dealer:" textFill="WHITE" />
       <HBox fx:id="dealerCard" layoutX="284.0" layoutY="77.0" prefHeight="100.0" prefWidth="200.0" />
-      <TextArea id="one" fx:id="MsgBox" layoutX="270.0" layoutY="473.0" prefHeight="136.0" prefWidth="244.0" promptText="press DEAL to start game. May the odds be ever in your favor">
-         <effect>
-            <InnerShadow />
-         </effect>
-      </TextArea>
-      <Label fx:id="totalScore" layoutX="50.0" layoutY="283.0" prefHeight="50.0" prefWidth="160.0" text="Total Score" textFill="#030303">
+      <Label fx:id="totalScore" layoutX="50.0" layoutY="206.0" prefHeight="50.0" prefWidth="160.0" text="Total Score:" textFill="#030303">
          <font>
             <Font size="15.0" />
          </font>
       </Label>
-      <Label fx:id="turnScore" layoutX="50.0" layoutY="209.0" prefHeight="50.0" prefWidth="160.0" text="Turn Score" textFill="#030303">
+      <Label fx:id="turnScore" layoutX="50.0" layoutY="229.0" prefHeight="50.0" prefWidth="160.0" text="Current Turn Score:" textFill="#030303">
          <font>
             <Font size="15.0" />
          </font>
       </Label>
-      <Label fx:id="turn" alignment="CENTER" contentDisplay="CENTER" layoutX="263.0" layoutY="215.0" prefHeight="60.0" prefWidth="214.0" text="Turn" textAlignment="CENTER">
+      <Label fx:id="turn" alignment="CENTER" contentDisplay="CENTER" layoutX="-10.0" layoutY="169.0" prefHeight="60.0" prefWidth="214.0" text="Round:   " textAlignment="CENTER">
          <font>
             <Font size="24.0" />
+         </font>
+      </Label>
+      <Label fx:id="resultLable" layoutX="297.0" layoutY="237.0" prefHeight="50.0" prefWidth="168.0">
+         <font>
+            <Font name="System Bold" size="25.0" />
+         </font>
+      </Label>
+      <Label fx:id="msgLabel" layoutX="295.0" layoutY="540.0" prefHeight="60.0" prefWidth="280.0" textFill="WHITE">
+         <font>
+            <Font size="18.0" />
          </font>
       </Label>
    </children>
