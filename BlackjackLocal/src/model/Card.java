@@ -11,27 +11,21 @@ public class Card  implements BasicCard
 	     private final Suit suit;
 	     private boolean faceup;// defines if the cards is faceup or down.
 	     private String loc;// the location string of the specific card location.
-//	     private FlippableCard fc;
+   
 	   /**
 	    * this ctor sets the rank and suit of the card and in accordance gets the coorect string.
 	    * @param rank
 	    * @param suit
 	    */
 	   public Card (final Rank rank, final Suit suit) {
-		   //super(CardImageLoader.getImageLocation(suit, rank), "/view/fxml/img/CardBack.png");
+		   
 		   this.rank = rank;
 	       this.suit = suit;
 	       faceup=false; // default is face down
 	       loc=CardImageLoader.getImageLocation(this.suit, this.rank);
-//	       this.fc = FlippableCard.createInstance(loc, "/view/fxml/img/CardBack.png");
+     
 	   }
-	   
-/*	   public void flipAnim()
-	   {
-		   fc.flip();
-	   }
-	   
-	*/   
+  
 	   /**
 	    * returns the card rank.
 	    */

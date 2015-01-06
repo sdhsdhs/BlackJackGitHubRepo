@@ -99,6 +99,9 @@ public class PlayerHand implements BasicHand {
 		}
 	}
 	
+	/*
+	 * get the last card the player drew
+	 */
 	public Card getLastCard(){
 		return this.hand.get(hand.size()-1);
 	}
