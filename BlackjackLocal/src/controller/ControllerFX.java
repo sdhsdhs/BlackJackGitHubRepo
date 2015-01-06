@@ -5,6 +5,7 @@ package controller;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+
 import model.BlackjackGame;
 import model.Card;
 import model.Deck.EmptyDeckException;
@@ -19,9 +20,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
@@ -83,10 +84,55 @@ public class ControllerFX implements Initializable, ControlledScreen {
 	 */
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-
+		msgLabel.setText("Press Deal To Start");
+		resultLable.setTextFill(Paint.valueOf("white")); //cosmetics.
+		turn.setTextFill(Paint.valueOf("white"));
+		turnScore.setTextFill(Paint.valueOf("white"));
+		totalScore.setTextFill(Paint.valueOf("white"));		
 	}
 	
+	/**
+	 * this is the listener to the reset button
+	 * it resets the game scores and rounds and puts the game back
+	 * at starting position.
+	 */
+	public void btnResetListener(ActionEvent evnt){
+		resetGame();
+		turn.setText("Round: ");
+		totalScore.setText("Total Score: ");
+		turnScore.setText("Current Turn Score: ");
+		playerVal.setText("Player hand");
+		dealerVal.setText("Dealer Hand");
+		msgLabel.setText("Press Deal To Start");
+	}
 	
+	/**
+	 *the method clear all cards from the table
+	 *begins a new game and reset the controller to start position. 
+	 */
+	private void resetGame()
+	{
+		clearBoard();
+		bj.resetScore();
+		try {
+			bj.beginGame();
+		} catch (EmptyDeckException e) {
+			e.printStackTrace();
+		}
+		resetController();
+	}
+	
+	/**
+	 * use animation to take cards if exist back to the dealer.
+	 */
+	private void clearBoard()
+	{
+		for (Node n : myController.getChildren()) 
+		{
+			if(n.toString().contains("ImageView") )
+				animateOut(n);
+		}
+	}
 	/**
 	 * this function is the listener to the view DEAL button.
 	 * it set the Images of the hands to their appropriate position in the Stage.
@@ -99,11 +145,7 @@ public class ControllerFX implements Initializable, ControlledScreen {
 		if(btnSetting[0]){
 			//clear the board
 			resetController();
-			for (Node n : myController.getChildren()) 
-			{
-				if(n.toString().contains("ImageView") )
-					animateOut(n);
-			}
+			clearBoard();			
 			
 			//start new turn
 			btnSetting[0]=false;// deal no longer available.

@@ -269,4 +269,9 @@ public class BlackjackGame // model class
 		return dealerBurn;
 	}
 
+	public void resetScore() {
+		this.Totalscore=0;
+		this.turn=0;
+	}
+
 }// end of class
