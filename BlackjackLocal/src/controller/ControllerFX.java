@@ -26,6 +26,7 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
+import javafx.scene.text.Font;
 import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
 
@@ -67,6 +68,7 @@ public class ControllerFX implements Initializable, ControlledScreen {
 	boolean flagFlippedCard = true;
 	
 	private boolean[] btnSetting;//array to control buttons availability.
+	private Font font;
 	
 	/**
 	 * the constructor with a reference to a game(the model).
@@ -75,7 +77,7 @@ public class ControllerFX implements Initializable, ControlledScreen {
 		
 		this.bj = new BlackjackGame();
 		bj.beginGame();
-		btnSetting = new boolean[]{true,false,false,true};
+		btnSetting = new boolean[]{true,false,false,true,false};
 	}
 	
 	/*
@@ -88,7 +90,8 @@ public class ControllerFX implements Initializable, ControlledScreen {
 		resultLable.setTextFill(Paint.valueOf("white")); //cosmetics.
 		turn.setTextFill(Paint.valueOf("white"));
 		turnScore.setTextFill(Paint.valueOf("white"));
-		totalScore.setTextFill(Paint.valueOf("white"));		
+		totalScore.setTextFill(Paint.valueOf("white"));
+		font = resultLable.getFont();
 	}
 	
 	/**
@@ -97,13 +100,19 @@ public class ControllerFX implements Initializable, ControlledScreen {
 	 * at starting position.
 	 */
 	public void btnResetListener(ActionEvent evnt){
-		resetGame();
-		turn.setText("Round: ");
-		totalScore.setText("Total Score: ");
-		turnScore.setText("Current Turn Score: ");
-		playerVal.setText("Player hand");
-		dealerVal.setText("Dealer Hand");
-		msgLabel.setText("Press Deal To Start");
+		if(btnSetting[4]){	
+			resetGame();
+			turn.setText("Round: ");
+			totalScore.setText("Total Score: ");
+			turnScore.setText("Current Turn Score: ");
+			playerVal.setText("Player hand");
+			dealerVal.setText("Dealer Hand");
+			msgLabel.setText("Press Deal To Start");
+		}else
+		{
+			resultLable.setFont(Font.font(13));
+			resultLable.setText("reset availble after animation");
+		}
 	}
 	
 	/**
@@ -146,7 +155,7 @@ public class ControllerFX implements Initializable, ControlledScreen {
 			//clear the board
 			resetController();
 			clearBoard();			
-			
+			btnSetting[4]=false;
 			//start new turn
 			btnSetting[0]=false;// deal no longer available.
 			bj.incTurn();
@@ -160,6 +169,9 @@ public class ControllerFX implements Initializable, ControlledScreen {
 	            @Override
 	            public void handle(ActionEvent event) {
 	            	playerVal.setText("Player hand: "+Integer.toString(bj.getPlayerValue()));
+	            	btnSetting[4]=true;
+	            	btnSetting[1]=true;//enable hit.
+	    			btnSetting[2]=true;//enable stand.
 	            }
 			});
 			cardsFlow.play();
@@ -169,8 +181,7 @@ public class ControllerFX implements Initializable, ControlledScreen {
 			cardsFlow.play();
 			cardsFlow = new SequentialTransition();
 			turnScore.setText("Current Turn Score: "+Integer.toString(bj.getTurnScore()));
-			btnSetting[1]=true;//enable hit.
-			btnSetting[2]=true;//enable stand.
+			
 		}else{//deal not available display msg
 			
 			msgLabel.setText("Deal Not Availble");
@@ -188,36 +199,50 @@ public class ControllerFX implements Initializable, ControlledScreen {
 	{
 		if(btnSetting[1])
 		{
+			btnSetting[4]=false;
+			btnSetting[1]=false;
 			Card c = bj.playerDraw();
 			appendSinglePicAnimated(c, "player"); //prepare the animation.
+			cardsFlow.setOnFinished(new EventHandler<ActionEvent>() { //make sure the hand value display only after cards. 
+	            @Override
+	            public void handle(ActionEvent event) {
+	            	playerVal.setText("Player hand: "+Integer.toString(bj.getPlayerValue()));
+	            	if(bj.getPlayerValue()>21)//if player Burns
+	    			{
+	    				if(!resultLable.getFont().equals(font))
+	    					resultLable.setFont(font);
+	    				btnSetting[0]=true;
+	    				btnSetting[2]=false;
+	    				btnSetting[1]=false;
+	    				bj.setPlayerBurn();
+	    				bj.updateScores();
+	    			
+	    				msgLabel.setText("Press Deal to play again.");
+	    				resultLable.setText("Dealer Win");
+	    			}else
+	    			{
+	    				btnSetting[1]=true;
+	    			}
+	            	btnSetting[4]=true;
+	            }
+			});
+			
 			cardsFlow.play();//fire the animation.
 			cardsFlow = new SequentialTransition();//reset the animation.
 		
-			playerVal.setText("Player hand: "+Integer.toString(bj.getPlayerValue()));
+			
 			turnScore.setText("Current Turn Score: "+Integer.toString(bj.getTurnScore()));
 			if(bj.getPlayerValue()==21){//Case Player have 21 now turn move to dealer.
 				
 				btnStandListener(evnt);
 			}
-			//case Player Burn.
-			if(bj.getPlayerValue()>21)
-			{
-				btnSetting[0]=true;
-				btnSetting[2]=false;
-				btnSetting[1]=false;
-				bj.setPlayerBurn();
-				bj.updateScores();
-			
-				msgLabel.setText("Press Deal to play again.");
-				resultLable.setText("Dealer Win");
-			}
+
 		}else if(bj.getPlayerBurn()) //case Player Burned and hit.
 				{
 					msgLabel.setText("You Burned press Deal or Quit");
 					
 				}else{
-				
-					msgLabel.setText("HIT not availble");
+					msgLabel.setText("HIT availble after Card is in hand\nOr after DEAL only.");
 				}
 	}//end of hit listener
 	
@@ -226,7 +251,9 @@ public class ControllerFX implements Initializable, ControlledScreen {
 	 */
 	private void resetController() {
 		
-		btnSetting = new boolean[]{true,false,false,true};
+		if(!resultLable.getFont().equals(font))
+			resultLable.setFont(font);
+		btnSetting = new boolean[]{true,false,false,true,true};
 		bj.nextTurn();
 		dealerPosOffset = -50;
 		playerPosOffset = -50;
@@ -250,6 +277,7 @@ public class ControllerFX implements Initializable, ControlledScreen {
 			//unable Stand and Hit.
 			btnSetting[2]=false;
 			btnSetting[1]=false;
+			btnSetting[4]=false;
 			
 			dealerVal.setText("Dealer hand: "+Integer.toString(bj.getDealerValue()));//show value
 			bj.showAllDealerCards();//make the card apparent.
@@ -279,9 +307,12 @@ public class ControllerFX implements Initializable, ControlledScreen {
 			cardsFlow.setOnFinished(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+            	if(!resultLable.getFont().equals(font))
+					resultLable.setFont(font);
             	dealerVal.setText("Dealer hand: "+Integer.toString(bj.getDealerValue()));//display dealer total hand value
             	bj.checkVictory(resultLable,msgLabel);//check who wins and display msg.
             	btnSetting[0]=true;//enable deal
+            	btnSetting[4]=true;
             }
 			});
 			cardsFlow.play();		
@@ -289,12 +320,12 @@ public class ControllerFX implements Initializable, ControlledScreen {
 			
 		}else{
 			if(bj.getPlayerBurn())
-			{	msgLabel.setText("Can't Stand You Burned.");
-				
+			{	
+				msgLabel.setText("You Burned press Deal or Quit");
 			}
 			else{
 				
-				msgLabel.setText("STAND not availble");
+				msgLabel.setText("press DEAL for new round");
 			}
 			
 		}
